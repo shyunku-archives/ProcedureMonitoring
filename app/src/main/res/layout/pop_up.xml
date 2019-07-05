@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_marginTop="20dp"
+    android:layout_height="match_parent">
+
+    <Switch
+        android:id="@+id/switch1"
+        style="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="현재 시간 시작으로 설정"
+        android:textSize="15dp"
+        />
+
+    <EditText
+        android:id="@+id/procName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="작업 이름" />
+
+    <EditText
+        android:id="@+id/startFlag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="시작 날짜 및 시간 (YYYYMMDDhhmm)" />
+
+    <EditText
+        android:id="@+id/endFlag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="종료 날짜 및 시간 (YYYYMMDDhhmm)" />
+
+    <TextView
+        android:id="@+id/error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/errorInk"
+        android:textSize="12sp" />
+</LinearLayout>

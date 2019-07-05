@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="checkbox_margin">18dp</dimen>
+    <dimen name="dialog_margin_top">40dp</dimen>
+</resources>
