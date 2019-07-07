@@ -3,6 +3,8 @@ package com.example.myapplication1;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,12 +22,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     Context mContext;
@@ -33,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+
+    String deviceID = null;
+    String deviceKey = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +57,79 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
 
+        deviceID = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+
         final ArrayList<Procedure> items = new ArrayList<>();
+
+
+
+        DatabaseReference ref = FirebaseDatabaseEngine.getFreshLocalDB().getReference("Devices");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean searched = false;
+                if(dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        User user = snapshot.getValue(User.class);
+                        String idCheck = snapshot.child("id").getValue().toString();
+                        if (idCheck.equals(deviceID)) {
+                            registerKey(snapshot.getKey());
+                            searched = true;
+                            break;
+                        }
+                    }
+                }
+                if(!searched){
+                    //사용자 추가
+                    Log.d("ID_CHECK", "ID 없음, 등록");
+                    User user = new User(deviceID);
+                    String key = FirebaseDatabaseEngine.getFreshLocalDBref().child("Devices").push().getKey();
+                    registerKey(key);
+
+                    Map<String, Object> postVal = user.toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/Devices/"+key, postVal);
+
+                    FirebaseDatabaseEngine.getFreshLocalDBref().updateChildren(childUpdates);
+                }else {
+                    DatabaseReference sref = FirebaseDatabaseEngine.getFreshLocalDB().getReference("Devices/"+deviceKey+"/procedures");
+                    sref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                String procName = snapshot.child("procName").getValue().toString();
+                                Calendar regFl, stFl, edFl;
+                                regFl = Calendar.getInstance();
+                                stFl = Calendar.getInstance();
+                                edFl = Calendar.getInstance();
+                                regFl.setTimeInMillis(Long.parseLong(snapshot.child("registerFlag").getValue().toString()));
+                                stFl.setTimeInMillis(Long.parseLong(snapshot.child("startFlag").getValue().toString()));
+                                edFl.setTimeInMillis(Long.parseLong(snapshot.child("endFlag").getValue().toString()));
+                                items.add(new Procedure(procName, regFl, stFl, edFl));
+                                Log.e("right", regFl.getTimeInMillis()+" "+stFl.getTimeInMillis()+" "+edFl.getTimeInMillis());
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
         adapter = new MyRecyclerAdapter(items, MainActivity.this);
         recyclerView.setAdapter(adapter);
-
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -136,19 +213,30 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
+                        Procedure proc = null;
                         try {
                             if (sdf.parse(startFlagView.getText().toString()).getTime() > sdf.parse(endFlagView.getText().toString()).getTime()) {
                                 errorText.setText("종료 시점이 시작 시점보다 앞서 있습니다.");
                                 return;
                             }
 
-                            items.add(new Procedure(
+                            proc = new Procedure(
                                     procName.getText().toString(),
                                     newCalendar(new Date(System.currentTimeMillis())),
                                     newCalendar(sdf.parse(startFlagView.getText().toString())),
                                     newCalendar(sdf.parse(endFlagView.getText().toString()))
-                            ));
+                            );
+                            items.add(proc);
                         }catch(Exception e){}
+
+                        String procKey = FirebaseDatabaseEngine.getFreshLocalDB().getReference("Devices/"+deviceKey).child("procedures").push().getKey();
+                        Map<String, Object> postVal = proc.toMap();
+
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("/Devices/"+deviceKey+"/procedures/"+ procKey, postVal);
+
+                        FirebaseDatabaseEngine.getFreshLocalDBref().updateChildren(childUpdates);
+
                         dialog.dismiss();
                     }
                 });
@@ -197,5 +285,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    private void registerKey(String key){
+        this.deviceKey = key;
     }
 }

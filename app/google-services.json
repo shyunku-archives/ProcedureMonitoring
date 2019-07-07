@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "166314567897",
+    "firebase_url": "https://procedure-monitoring.firebaseio.com",
+    "project_id": "procedure-monitoring",
+    "storage_bucket": "procedure-monitoring.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166314567897:android:ac3141b0718defa3",
+        "android_client_info": {
+          "package_name": "com.example.myapplication1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "166314567897-kd9s20tjnrob8jg8uc16vctbi95dqgdd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapplication1",
+            "certificate_hash": "9ba01d046e56f17ddc0d4af94a5c56c28ead1bcd"
+          }
+        },
+        {
+          "client_id": "166314567897-a48cgs2sdvhp5qg52r9ckr50usbfnbph.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXX-TVt2iN1Vuci7l4fEwEkmT2iTrETU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "166314567897-a48cgs2sdvhp5qg52r9ckr50usbfnbph.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

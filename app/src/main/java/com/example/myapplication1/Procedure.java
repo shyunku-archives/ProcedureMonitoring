@@ -1,12 +1,18 @@
 package com.example.myapplication1;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Procedure {
     private String procedureName;
     private Calendar registerFlag;
     private Calendar startFlag;
     private Calendar endFlag;
+
+    public Procedure(){}
 
     public Procedure(String procedureName, Calendar registerFlag, Calendar startFlag, Calendar endFlag) {
         this.procedureName = procedureName;
@@ -91,5 +97,16 @@ public class Procedure {
         if(proc>1) return 1;
         if(proc<0) return 0;
         return proc;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap(){
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("procName", procedureName);
+        result.put("registerFlag", registerFlag.getTimeInMillis()+"");
+        result.put("startFlag", startFlag.getTimeInMillis()+"");
+        result.put("endFlag", endFlag.getTimeInMillis()+"");
+
+        return result;
     }
 }

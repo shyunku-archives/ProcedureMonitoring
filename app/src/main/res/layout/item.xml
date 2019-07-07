@@ -20,6 +20,7 @@
             android:layout_height="match_parent"
             android:layout_margin="0dp"
             >
+
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
@@ -27,7 +28,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="10dp"
-                android:text="군대 가기"
+                android:text="Sample Procedure"
                 android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
