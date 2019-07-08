@@ -1,4 +1,4 @@
-package com.example.myapplication1;
+package com.shyunku.myapp;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
